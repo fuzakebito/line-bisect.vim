@@ -36,19 +36,19 @@ function! line_bisect#down() abort
 endfunction
 
 function! s:place_sign() abort
-  let s:id = 1
-  if s:range.mid - s:range.top > 0
-    for l:line in range(s:range.top, s:range.mid-1)
+  let s:id = 0
+  for l:line in range(line('w0'), line('w$'))
+    let s:id += 1
+    if l:line >= s:range.top && l:line < s:range.mid
       exe 'sign place ' . s:id . ' group=line_bisect line=' . l:line . ' name=line_bisect_up file=' . expand('%:p')
-      let s:id += 1
-    endfor
-  endif
-  if s:range.bot - s:range.mid > 0
-    for l:line in range(s:range.mid+1, s:range.bot)
+    elseif l:line == s:range.mid
+      exe 'sign place ' . s:id . ' group=line_bisect line=' . l:line . ' name=line_bisect_mid file=' . expand('%:p')
+    elseif l:line <= s:range.bot && l:line > s:range.mid
       exe 'sign place ' . s:id . ' group=line_bisect line=' . l:line . ' name=line_bisect_down file=' . expand('%:p')
-      let s:id += 1
-    endfor
-  endif
+    else
+      exe 'sign place ' . s:id . ' group=line_bisect line=' . l:line . ' name=line_bisect_blank file=' . expand('%:p')
+    endif
+  endfor
 endfunction
 
 function! s:unplace_sign() abort
